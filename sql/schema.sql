@@ -16,7 +16,8 @@ CREATE TABLE customers(
 
 CREATE TABLE products(
 	StockCode VARCHAR(20) PRIMARY KEY,
-	Description TEXT
+	Description TEXT,
+	is_real_product BOOLEAN
 );
 
 CREATE TABLE dim_date(
