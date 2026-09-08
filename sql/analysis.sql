@@ -107,7 +107,7 @@ SELECT rt.CustomerID,
 	   total_revenue,
 	   CASE 
 	   		WHEN ((recency_quartile+frequency_quartile+monetary_quartile) / 3.0) = 1 THEN 'high'
-			WHEN ((recency_quartile+frequency_quartile+monetary_quartile) / 3.0) BETWEEN 1 AND 2 THEN 'medium'
+			WHEN ((recency_quartile+frequency_quartile+monetary_quartile) / 3.0) BETWEEN 1 AND 3 THEN 'medium'
 			ELSE 'low'
 			END AS priority
 FROM recency_table rt
