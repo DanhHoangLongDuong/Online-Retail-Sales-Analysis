@@ -6,9 +6,13 @@ WHERE CustomerID IS NOT NULL
 GROUP BY CustomerID
 ;
 
-INSERT INTO products (StockCode, Description)
+-- is_real_product is to identify real products and not admin code (POST, DOT, M, etc.)
+INSERT INTO products (StockCode, Description, is_real_product)
 SELECT StockCode, 
-	   MODE() WITHIN GROUP (ORDER BY Description) AS Description
+	   MODE() WITHIN GROUP (ORDER BY Description) AS Description,
+	   CASE WHEN StockCode ~ '^[0-9]' THEN TRUE
+	   ELSE FALSE
+	   END AS is_real_product
 FROM staging_online_retail
 GROUP BY StockCode
 ;
@@ -24,6 +28,7 @@ FROM staging_online_retail
 WHERE InvoiceDate IS NOT NULL
 ;
 
+--is_cancelled is to identify cancelled orders
 INSERT INTO orders (InvoiceNo, StockCode, CustomerID, InvoiceDate, Quantity, UnitPrice, is_cancelled)
 SELECT InvoiceNo,
 	   StockCode,
