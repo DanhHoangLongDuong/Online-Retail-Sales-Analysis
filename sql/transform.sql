@@ -7,14 +7,15 @@ GROUP BY CustomerID
 ;
 
 -- is_real_product is to identify real products and not admin code (POST, DOT, M, etc.)
+-- UPPER(StockCode) to solve problem with 2 identical StockCode but different case: 15056bl and 15056BL
 INSERT INTO products (StockCode, Description, is_real_product)
-SELECT StockCode, 
+SELECT UPPER(StockCode) AS StockCode, 
 	   MODE() WITHIN GROUP (ORDER BY Description) AS Description,
-	   CASE WHEN StockCode ~ '^[0-9]' THEN TRUE
+	   CASE WHEN UPPER(StockCode) ~ '^[0-9]' THEN TRUE
 	   ELSE FALSE
 	   END AS is_real_product
 FROM staging_online_retail
-GROUP BY StockCode
+GROUP BY UPPER(StockCode)
 ;
 
 INSERT INTO dim_date (date_key, year, quarter, month, month_name, day_of_week)
@@ -31,13 +32,13 @@ WHERE InvoiceDate IS NOT NULL
 --is_cancelled is to identify cancelled orders
 INSERT INTO orders (InvoiceNo, StockCode, CustomerID, InvoiceDate, Quantity, UnitPrice, is_cancelled)
 SELECT InvoiceNo,
-	   StockCode,
+	   UPPER(StockCode) AS StockCode,
 	   CustomerID,
-	   InvoiceDate,
+	   InvoiceDate::date AS InvoiceDate,
 	   Quantity,
 	   UnitPrice,
 	   CASE
-	   		WHEN InvoiceNo LIKE 'C%' THEN TRUE
+	   		WHEN quantity < 0 THEN TRUE
 			ELSE FALSE
 	   END AS is_cancelled
 FROM staging_online_retail

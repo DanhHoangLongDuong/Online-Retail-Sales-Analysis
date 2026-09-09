@@ -67,7 +67,7 @@ FROM orders
 WHERE is_cancelled = TRUE;
 
 -- RFM
-CREATE VIEW customer_rfm AS
+CREATE OR REPLACE VIEW customer_rfm AS
 --Recency
 WITH recency_table AS (
 SELECT CustomerID,
@@ -116,6 +116,3 @@ ON rt.CustomerID = ft.CustomerID
 INNER JOIN monetary_table mt
 ON rt.CustomerID = mt.CustomerID
 ;
-
-
-
