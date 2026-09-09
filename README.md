@@ -1,98 +1,81 @@
-\# Online Retail Sales Analysis - SQL + Power BI
+# Online Retail Sales Analysis - SQL + Power BI
 
 Data cleaning, star-schema modeling, and RFM customer segmentation on a messy, real-world e-commerce dataset.
 
 
 
-!\[overview](images/overview\_page.png)
+![overview](images/overview\_page.png)
 
 
 
-\## Project Overview
+## Project Overview
 
-Analysis of \~540,000 transactions from a UK-based online gift retailer (Dec 2010 - Dec 2011).
+Analysis of ~540,000 transactions from a UK-based online gift retailer (Dec 2010 - Dec 2011).
 
-\[dataset source](https://www.kaggle.com/datasets/tunguz/online-retail)
+[dataset source](https://www.kaggle.com/datasets/tunguz/online-retail)
 
 
 
-Unlike a lot of Kaggle datasets, this one is messy - inconsistent product codes, \~25% missing customer IDs, administrative line items mixed in with real products, and ambiguous cancellation data. 
+Unlike a lot of Kaggle datasets, this one is messy - inconsistent product codes, ~25% missing customer IDs, administrative line items mixed in with real products, and ambiguous cancellation data. 
 
 The project covers the full pipeline: staging and cleaning the raw data in PostgreSQL, modeling it into a star schema, and building a 3-page Power BI dashboard with DAX-driven KPIs and an RFM customer segmentation.
 
 
 
-\## Tech Stack
+## Tech Stack
 
-\- \*\*PostgreSQL\*\* - staging, cleaning, and star-schema modeling
+- **PostgreSQL** - staging, cleaning, and star-schema modeling
 
-\- \*\*Power BI\*\* - data model, DAX measures, dashboard
+- **Power BI** - data model, DAX measures, dashboard
 
-\- \*\*SQL\*\* - window functions, CTEs, views
+- **SQL** - window functions, CTEs, views
 
 
 
-\## Key Findings
+## Key Findings
 
-\- \*\*Revenue is concentrated in a small group of customers\*\*. Customers scored "high priority" by the RFM model make up around 11% of the customer base, but generate more total revenue than the "low priority" segment - nearly 3x its size - combined. (See Customers % RFM page)
+- **Revenue is concentrated in a small group of customers**. Customers scored "high priority" by the RFM model make up around 11% of the customer base, but generate more total revenue than the "low priority" segment - nearly 3x its size - combined. (See Customers % RFM page)
 
-\- \*\*RFM catches what a simple revenue ranking misses.\*\* Customer 12346 spent £77,183 - enough to rank in the top 10 by revenue alone - but it came from a single order placed 325 days ago. RFM correctly scores this customer as medium priority despite the high lifetime spend,
+- **RFM catches what a simple revenue ranking misses.** Customer 12346 spent £77,183 - enough to rank in the top 10 by revenue alone - but it came from a single order placed 325 days ago. RFM correctly scores this customer as medium priority despite the high lifetime spend,
 
 which a naive "sort by total revenue" approach would have missed entirely.
 
-!\[12346](images/customer12346.png)
+![12346](images/customer12346.png)
 
-\- \*\*Strong seasonality\*\*, consistent with a gift retailer: revenue climbs through Q4, peaking in November, then drops sharply in December as the ordering window for Christmas delivery closes.
+- **Strong seasonality**, consistent with a gift retailer: revenue climbs through Q4, peaking in November, then drops sharply in December as the ordering window for Christmas delivery closes.
 
-\- \*\*The UK accounts for the large majority of revenue\*\*, with the Netherlands, Ireland, Germany, and France as distant next-largest markets.
+- **The UK accounts for the large majority of revenue**, with the Netherlands, Ireland, Germany, and France as distant next-largest markets.
 
 
 
-\## Data Cleaning Highlights
+## Data Cleaning Highlights
 
 The raw data required more than a straightforward import. Some of the issues found and how they were handled:
 
 
 
 | Issue | Fix |
-
 |---|---|
-
 |Same product stored as `15056bl` and `15056BL`|Normalized all `StockCode` values to uppercase|
-
-|Administrative line items (`POST`, `DOT`, `M`, `BANK CHARGES`, `CRUK`, `C2`, `AMAZONFEE`) mixed into product data|Built a regex-based `is\_real\_product` flag (numeric-first codes only) instead of a hardcoded exclusion list|
-
-|\~25% of rows missing `CustomerID`|Kept in the fact table - it is still real revenue, just excluded from customer-level analysis (RFM, country-by-customer)|
-
+|Administrative line items (`POST`, `DOT`, `M`, `BANK CHARGES`, `CRUK`, `C2`, `AMAZONFEE`) mixed into product data|Built a regex-based `is_real_product` flag (numeric-first codes only) instead of a hardcoded exclusion list|
+|~25% of rows missing `CustomerID`|Kept in the fact table - it is still real revenue, just excluded from customer-level analysis (RFM, country-by-customer)|
 |Some negative-quantity rows were not `C` - prefixed cancellations|Investigated a sample (null `CustomerID`, £0 price, large round quantities - consistent with inventory write-offs, not customer returns) and made the documented call to treat any negative quantity as excluded, since intent could 
-
 not be reliably distinguished from the data alone|
-
 |Duplicate/near-duplicate product descriptions per `StockCode`|Resolved with `MODE()` - kept the most frequently occurring description per code|
 
+Full cleaning logic is in [sql/transform.sql](sql/transform.sql)
 
+## Data Model
 
-Full cleaning logic is in \[sql/transform.sql](sql/transform.sql)
+![relationship](images/relationships.png)
 
+A star schema with `orders` as the fact table, and `customers`, `products`, and `dim_date` as dimensions. `customer_rfm` sits as an outrigger off `customers` - a SQL `VIEW` holding pre-computed recency/frequency/monetary scores and a priority label, refreshed independently of the fact table.
 
+## Dashboard
 
-\## Data Model
+### Overview
 
-
-
-!\[relationship](images/relationships.png)
-
-
-
-A star schema with `orders` as the fact table, and `customers`, `products`, and `dim\_date` as dimensions. `customer\_rfm` sits as an outrigger off `customers` - a SQL `VIEW` holding pre-computed recency/frequency/monetary scores and a priority label, refreshed independently of the fact table.
-
-
-
-\## Dashboard
-
-\### Overview
-
-!\[overview](images/overview\_page.png)
+![overview](images/overview\_page.png)
 
 
 
@@ -100,9 +83,9 @@ Headline KPIs (£10.64M net revenue, £513.54 average order value, 4.3K customer
 
 
 
-\### Product Performance
+### Product Performance
 
-!\[product\_performance](images/product\_performance.png)
+![product_performance](images/product\_performance.png)
 
 
 
@@ -112,9 +95,9 @@ with 3+ orders to avoid small-sample distortion.
 
 
 
-\### Customers \& RFM
+### Customers & RFM
 
-!\[Customers](images/Customers.png)
+![Customers](images/Customers.png)
 
 
 
@@ -122,29 +105,29 @@ Priority segment distribution, revenue by segment, a recency-vs-revenue scatter 
 
 
 
-\## How to Reproduce
+## How to Reproduce
 
-1\. Download the dataset from \[Kaggle](https://www.kaggle.com/datasets/tunguz/online-retail) and place the CSV in `data/`
+1. Download the dataset from [Kaggle](https://www.kaggle.com/datasets/tunguz/online-retail) and place the CSV in `data/`
 
-2\. Run `sql/schema.sql`
+2. Run `sql/schema.sql`
 
-3\. Load the CSV into staging:
-
-```
-
-&#x20; psql -U postgres -d online\_retail -f sql/load.sql
+3. Load the CSV into staging:
 
 ```
 
-4\. Run `sql/transform.sql`
+  psql -U postgres -d online_retail -f sql/load.sql
 
-5\. Run `sql/analysis.sql`
+```
 
-6\. Open `powerbi/online\_retail\_report.pbix` in Power BI Desktop and point the PostgreSQL connection at your local database
+4. Run `sql/transform.sql`
+
+5. Run `sql/analysis.sql`
+
+6. Open `powerbi/online_retail_report.pbix` in Power BI Desktop and point the PostgreSQL connection at your local database
 
 
 
-\## Project Structure
+## Project Structure
 
 
 
@@ -170,25 +153,25 @@ online-retail-sql-powerbi/
 
 ├── powerbi/
 
-│   └── online\_retail\_report.pbix
+│   └── online_retail_report.pbix
 
 └── images/
 
-&#x20;   ├── overview.png
+         ├── overview.png
 
-&#x20;   ├── product\_performance.png
+         ├── product_performance.png
 
-&#x20;   ├── customers.png
+         ├── customers.png
 
-&#x20;   └── relationships.png
+         └── relationships.png
 
 ```
 
 
 
-\## Author
+## Author
 
-\*\*Long\*\*
+**Long**
 
 
 
