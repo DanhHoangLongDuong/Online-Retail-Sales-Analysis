@@ -58,8 +58,7 @@ The raw data required more than a straightforward import. Some of the issues fou
 |Same product stored as `15056bl` and `15056BL`|Normalized all `StockCode` values to uppercase|
 |Administrative line items (`POST`, `DOT`, `M`, `BANK CHARGES`, `CRUK`, `C2`, `AMAZONFEE`) mixed into product data|Built a regex-based `is_real_product` flag (numeric-first codes only) instead of a hardcoded exclusion list|
 |~25% of rows missing `CustomerID`|Kept in the fact table - it is still real revenue, just excluded from customer-level analysis (RFM, country-by-customer)|
-|Some negative-quantity rows were not `C` - prefixed cancellations|Investigated a sample (null `CustomerID`, £0 price, large round quantities - consistent with inventory write-offs, not customer returns) and made the documented call to treat any negative quantity as excluded, since intent could 
-not be reliably distinguished from the data alone|
+|Some negative-quantity rows were not `C` - prefixed cancellations|Investigated a sample (null `CustomerID`, £0 price, large round quantities - consistent with inventory write-offs, not customer returns) and made the documented call to treat any negative quantity as excluded, since intent could not be reliably distinguished from the data alone|
 |Duplicate/near-duplicate product descriptions per `StockCode`|Resolved with `MODE()` - kept the most frequently occurring description per code|
 
 Full cleaning logic is in [sql/transform.sql](sql/transform.sql)
