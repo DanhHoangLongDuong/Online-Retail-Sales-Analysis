@@ -130,6 +130,7 @@ Priority segment distribution, revenue by segment, a recency-vs-revenue scatter 
 ```
 online-retail-sql-powerbi/
 ├── README.md
+├── .gitattributes
 ├── .gitignore
 ├── data/                          (gitignored — see step 1 above)
 ├── sql/
