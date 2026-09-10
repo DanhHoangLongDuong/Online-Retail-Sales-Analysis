@@ -127,48 +127,26 @@ Priority segment distribution, revenue by segment, a recency-vs-revenue scatter 
 
 ## Project Structure
 
-
-
 ```
-
 online-retail-sql-powerbi/
-
 ├── README.md
-
 ├── .gitignore
-
 ├── data/                          (gitignored — see step 1 above)
-
 ├── sql/
-
 │   ├── schema.sql
-
 │   ├── load.sql
-
 │   ├── transform.sql
-
 │   └── analysis.sql
-
 ├── powerbi/
-
 │   └── online_retail_report.pbix
-
 └── images/
-
          ├── overview.png
-
          ├── product_performance.png
-
          ├── customers.png
-
          └── relationships.png
-
 ```
-
-
 
 ## Author
-
 **Long**
 
 
