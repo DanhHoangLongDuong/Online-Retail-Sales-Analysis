@@ -37,7 +37,6 @@ The project covers the full pipeline: staging and cleaning the raw data in Postg
 - **Revenue is concentrated in a small group of customers**. Customers scored "high priority" by the RFM model make up around 11% of the customer base, but generate more total revenue than the "low priority" segment - nearly 3x its size - combined. (See Customers % RFM page)
 
 - **RFM catches what a simple revenue ranking misses.** Customer 12346 spent £77,183 - enough to rank in the top 10 by revenue alone - but it came from a single order placed 325 days ago. RFM correctly scores this customer as medium priority despite the high lifetime spend,
-
 which a naive "sort by total revenue" approach would have missed entirely.
 
 ![12346](images/customer12346.png)
